@@ -9,9 +9,13 @@ import fleet_utils
 
 
 def car_wear(car: dict) -> float:
-    """Return the wear percentage for one car; treats a missing last_service_km as 0."""
-    last = car.get("last_service_km", 0)
-    return wear_percent(car.get("odometer", 0) - last, SERVICE_INTERVAL_KM)
+    """Return the wear percentage for one car.
+
+    If last_service_km is missing, treat it as just serviced (km_since = 0).
+    """
+    odometer = car.get("odometer", 0)
+    last = car.get("last_service_km", odometer)   # missing → assume serviced now
+    return wear_percent(odometer - last, SERVICE_INTERVAL_KM)
 
 
 def fleet_summary(fleet: list) -> dict:

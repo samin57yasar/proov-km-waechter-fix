@@ -12,9 +12,14 @@ def wear_percent(km_since_service: float, interval: float) -> float:
 
 
 def needs_service(car: dict) -> bool:
-    """Return True if this car has consumed at least WARN_AT_PERCENT of its service interval."""
-    last = car.get("last_service_km", 0)
-    km_since = car.get("odometer", 0) - last
+    """Return True if this car has consumed at least WARN_AT_PERCENT of its service interval.
+
+    If last_service_km is missing we cannot know how worn the car is, so we
+    treat it as just serviced (km_since = 0) rather than wrongly flagging it.
+    """
+    odometer = car.get("odometer", 0)
+    last = car.get("last_service_km", odometer)   # missing → assume serviced now
+    km_since = odometer - last
     return wear_percent(km_since, SERVICE_INTERVAL_KM) >= WARN_AT_PERCENT
 
 
